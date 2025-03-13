@@ -81,26 +81,25 @@ func (s *URLShortenerServer) acceptNetcats(listener net.Listener) {
 }
 
 func (s *URLShortenerServer) handleNetcats(conn net.Conn) {
+	defer conn.Close()
+
 	reader := bufio.NewReader(conn)
 	input, _ := reader.ReadString('\n')
 	input = strings.TrimSuffix(input, "\n")
 
 	if strings.TrimSpace(input) == "" {
 		_, _ = conn.Write([]byte("Don't send empty spaces!"))
-		conn.Close()
 		return
 	}
 
 	if _, err := url.ParseRequestURI(input); err != nil {
 		_, _ = conn.Write([]byte("Not a valid URL! "))
 		_, _ = conn.Write([]byte(input))
-		conn.Close()
 		return
 	}
 
 	key := s.store.Set(input)
 	_, _ = conn.Write(fmt.Appendln(nil, "key is", key))
-	conn.Close()
 }
 
 type URLStore struct {
