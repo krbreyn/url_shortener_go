@@ -142,6 +142,7 @@ func (kg *KeyGenerator) GenKey() string {
 
 		key := string(b)
 		if _, ok := kg.taken[key]; !ok {
+			kg.taken[key] = true
 			return key
 		}
 	}
